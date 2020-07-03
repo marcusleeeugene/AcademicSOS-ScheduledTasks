@@ -1,0 +1,17 @@
+{
+  "name": "academicsos-scheduledtasks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cron": "^1.8.2",
+    "express": "^4.17.1",
+    "firebase": "^7.15.5",
+    "moment": "^2.27.0"
+  }
+}
