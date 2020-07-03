@@ -6,7 +6,7 @@ function completeConsultation(modCode, bookingId, consultDetails) {
   var participants = consultDetails['participants'];
   if (participants != " ") { //If participants exist
     for (var user in participants) {
-      if (participants[user]['attending'] == true) { //each participant that has attended
+      if (participants[user]['attending'] == false) { //each participant that did not attend the consultation
         database
           .ref(`users/students/${participants[user].id}/modules/${modCode}`)
           .once("value")
