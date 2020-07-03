@@ -32,11 +32,12 @@ function completeConsultation(modCode, bookingId, consultDetails) {
 module.exports = {
   updateConsultEndTime: function () {
     console.log("Thread is running...")
-    return database
+    database
       .ref(`modules`)
       .once("value")
       .then((snapshot) => snapshot.val())
       .then((obj) => {
+        console.log("enter1")
         for (var modCode in obj) { //Loop each module
           //Loop through each module
           var modules = obj[modCode];
@@ -53,6 +54,7 @@ module.exports = {
                 var currentDateTime = moment(new Date(), ["DD-MMM-YY hh:mm A"]).format();
                 var consultationEndDateTime = moment(consultDate + " " + consultEndTime, ["DD-MMM-YY hh:mm A"]).format();
                 if (currentDateTime >= consultationEndDateTime) { //check if consultation date and time ended
+                  console.log("enter 2");
                   completeConsultation(modCode, bookingId, bookings[bookingId]);
                 }
               }
