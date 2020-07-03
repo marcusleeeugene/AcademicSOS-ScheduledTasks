@@ -16,6 +16,5 @@
   },
   "scripts": {
     "start": "node Main.js",
-    "build": "webpack"
   }
 }
