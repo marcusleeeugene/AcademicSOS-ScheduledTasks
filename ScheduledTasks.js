@@ -29,6 +29,7 @@ function completeConsultation(modCode, bookingId, consultDetails) {
 
 module.exports = {
   updateConsultEndTime: function () {
+    console.log("Thread is running...")
     return database
       .ref(`modules`)
       .once("value")
