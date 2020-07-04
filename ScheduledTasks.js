@@ -7,7 +7,6 @@ function completeConsultation(modCode, bookingId, consultDetails) {
   if (participants != " ") { //If participants exist
     for (var user in participants) {
       if (participants[user]['attending'] == false) { //each participant that did not attend the consultation
-        console.log(participants[user].name);
         database
           .ref(`users/students/${participants[user].id}/modules/${modCode}`)
           .once("value")
@@ -19,13 +18,19 @@ function completeConsultation(modCode, bookingId, consultDetails) {
               role: data.role,
               tutorialClass: data.tutorialClass
             });
-            console.log("Deducted 10 points from: " + participants[user].id);
+            console.log("Deducted 10 points from: " + participants[user].id + " " + participants[user].name);
+          }).then(() => {
+            if (user == participants.length - 1) { //once the last participant points have been updated, run the following
+              database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
+              console.log("Removed: " + bookingId);
+            }
           });
       }
     }
+  } else {
+    database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
+    console.log("Removed: " + bookingId);
   }
-  database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
-  console.log("Removed: " + bookingId);
 }
 
 module.exports = {
