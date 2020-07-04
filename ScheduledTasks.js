@@ -6,7 +6,6 @@ function completeConsultation(modCode, bookingId, consultDetails) {
   var participants = consultDetails['participants'];
   if (participants != " ") { //If participants exist
     for (var user in participants) {
-      console.log(user);
       if (participants[user]['attending'] == false) { //each participant that did not attend the consultation
         database
           .ref(`users/students/${participants[user].id}/modules/${modCode}`)
@@ -31,7 +30,7 @@ function completeConsultation(modCode, bookingId, consultDetails) {
 
 module.exports = {
   updateConsultEndTime: function () {
-    console.log("Thread is running... DateTime:" + moment(new Date()))
+    console.log("Thread is running... DateTime:" + moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
     database
       .ref(`modules`)
       .once("value")
@@ -40,7 +39,6 @@ module.exports = {
         console.log("enter1")
         console.log(obj);
         for (var modCode in obj) { //Loop each module
-          console.log("enter 2");
           //Loop through each module
           var modules = obj[modCode];
           var bookings = modules["bookings"];
@@ -56,7 +54,6 @@ module.exports = {
                 var currentDateTime = moment(new Date(), ["DD-MMM-YY hh:mm A"]).format();
                 var consultationEndDateTime = moment(consultDate + " " + consultEndTime, ["DD-MMM-YY hh:mm A"]).format();
                 if (currentDateTime >= consultationEndDateTime) { //check if consultation date and time ended
-                  console.log("enter 3");
                   completeConsultation(modCode, bookingId, bookings[bookingId]);
                 }
               }
