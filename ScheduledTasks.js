@@ -2,39 +2,34 @@ var firebase = require('firebase');
 var database = require("./FireBaseConfig.js");
 var moment = require("moment");
 
+function deductPoints(userIndex, participants, modCode, bookingId) {
+  var userId = participants[userIndex].id;
+  database
+    .ref(`users/students/${userId}/modules/${modCode}`)
+    .once("value")
+    .then((snapshot) => snapshot.val())
+    .then((data) => {
+      database.ref(`users/students/${userId}/modules`).child(modCode).update({ //deduct priority points
+        name: data.name,
+        priorityPoint: data.priorityPoint -= 10,
+        role: data.role,
+        tutorialClass: data.tutorialClass
+      });
+      console.log("Deducted 10 points from: " + userId);
+    })
+}
+
 function completeConsultation(modCode, bookingId, consultDetails) {
   var participants = consultDetails['participants'];
   if (participants != " ") { //If participants exist
-    console.log(participants);
     for (var user in participants) {
       if (participants[user]['attending'] == false) { //each participant that did not attend the consultation
-        var user_involved = participants[user].id;
-        database
-          .ref(`users/students/${user_involved}/modules/${modCode}`)
-          .once("value")
-          .then((snapshot) => snapshot.val())
-          .then((data) => {
-            console.log(user_involved);
-            database.ref(`users/students/${user_involved}/modules`).child(modCode).update({ //deduct priority points
-              name: data.name,
-              priorityPoint: data.priorityPoint -= 10,
-              role: data.role,
-              tutorialClass: data.tutorialClass
-            });
-            console.log("Deducted 10 points from: " + user_involved);
-          }).then(() => {
-            if (user == participants.length - 1) { //once the last participant points have been updated, run the following
-              console.log(user);
-              database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
-              console.log("Removed: " + bookingId);
-            }
-          });
+        deductPoints(user, participants, modCode, bookingId);
       }
     }
-  } else {
-    database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
-    console.log("Removed: " + bookingId);
   }
+  database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
+  console.log("Removed: " + bookingId);
 }
 
 module.exports = {

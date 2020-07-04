@@ -5,7 +5,7 @@
 
   <b> Task Available: </b>
   <ul>
-     <li> Check every 3 minutes to see if consultation has ended then, deduct the priority points for those who failed to show up and delete consultation from database. </li>
+     <li> Check every minute to see if consultation has ended then, deduct the priority points for those who failed to show up and delete consultation from database. </li>
   </ul>
 
   <b> Link to main project:</b>
