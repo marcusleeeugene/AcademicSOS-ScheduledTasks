@@ -41,8 +41,6 @@ module.exports = {
       .once("value")
       .then((snapshot) => snapshot.val())
       .then((obj) => {
-        console.log("enter1")
-        console.log(obj);
         for (var modCode in obj) { //Loop each module
           //Loop through each module
           var modules = obj[modCode];
