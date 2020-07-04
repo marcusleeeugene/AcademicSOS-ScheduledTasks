@@ -7,12 +7,12 @@ function completeConsultation(modCode, bookingId, consultDetails) {
   if (participants != " ") { //If participants exist
     for (var user in participants) {
       if (participants[user]['attending'] == false) { //each participant that did not attend the consultation
+        console.log(participants[user].name);
         database
           .ref(`users/students/${participants[user].id}/modules/${modCode}`)
           .once("value")
           .then((snapshot) => snapshot.val())
           .then((data) => {
-            console.log(data);
             database.ref(`users/students/${participants[user].id}/modules`).child(modCode).update({ //deduct priority points
               name: data.name,
               priorityPoint: data.priorityPoint -= 10,
