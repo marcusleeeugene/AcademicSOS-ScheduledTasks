@@ -12,6 +12,7 @@ function completeConsultation(modCode, bookingId, consultDetails) {
           .once("value")
           .then((snapshot) => snapshot.val())
           .then((data) => {
+            console.log(participants[user].id);
             database.ref(`users/students/${participants[user].id}/modules`).child(modCode).update({ //deduct priority points
               name: data.name,
               priorityPoint: data.priorityPoint -= 10,
