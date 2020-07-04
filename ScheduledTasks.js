@@ -5,6 +5,7 @@ var moment = require("moment");
 function completeConsultation(modCode, bookingId, consultDetails) {
   var participants = consultDetails['participants'];
   if (participants != " ") { //If participants exist
+    console.log(participants);
     for (var user in participants) {
       console.log(user);
       if (participants[user]['attending'] == false) { //each participant that did not attend the consultation
