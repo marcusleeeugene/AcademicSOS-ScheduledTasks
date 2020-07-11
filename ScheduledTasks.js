@@ -55,7 +55,9 @@ function role(id) {
 
 function notifyUserConsultation(modCode, bookingId, consultDetails) {
   var participants = consultDetails["participants"];
+  console.log(participants);
   for (var each in participants) {
+    console.log(each);
     var user = participants[each];
     if (user.altStatus == "Accepted") { //If user has accepted consultation already
       console.log(user);
