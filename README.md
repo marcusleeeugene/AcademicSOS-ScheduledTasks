@@ -3,7 +3,7 @@
     Scheduled tasks for AcademicSOS mobile application, where the files are hosted on Heroku.
   </p>
 
-  <b> Task Available: </b>
+  <b> Tasks Available: </b>
   <ul>
      <li> Perform a check every minute to see if consultation has ended then, deduct the priority points for those who failed to show up and delete consultation from database. </li>
      <li> Perform a check every minute and send push notifications to users 24 hours before their consultation.</li>
