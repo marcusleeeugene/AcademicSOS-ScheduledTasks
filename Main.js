@@ -1,7 +1,7 @@
 var ScheduledTasks = require('./ScheduledTasks.js');
 var CronJob = require('cron').CronJob;
 
-var task = new CronJob(
+var completedConsultationProcess = new CronJob(
 	'*/1 * * * *', //Every 1min run function
 	function() {
 		ScheduledTasks.updateConsultEndTime();
@@ -11,4 +11,16 @@ var task = new CronJob(
 	'Asia/Singapore'
 );
 
-task.start();
+var consultationReminderProcess = new CronJob(
+	'*/1 * * * *', //Every 1min run function
+	function() {
+		ScheduledTasks.consultationReminder();
+	},
+	null,
+	true,
+	'Asia/Singapore'
+);
+
+
+completedConsultationProcess.start();
+consultationReminderProcess.start();

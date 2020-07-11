@@ -5,7 +5,8 @@
 
   <b> Task Available: </b>
   <ul>
-     <li> Check every minute to see if consultation has ended then, deduct the priority points for those who failed to show up and delete consultation from database. </li>
+     <li> Perform a check every minute to see if consultation has ended then, deduct the priority points for those who failed to show up and delete consultation from database. </li>
+     <li> Perform a check every minute and send push notifications to users 24 hours before their consultation.</li>
   </ul>
 
   <b> Link to main project:</b>

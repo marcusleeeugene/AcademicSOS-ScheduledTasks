@@ -1,3 +1,5 @@
 npm install firebase
 npm install moment
 npm install cron
+//npm install expo-permissions
+npm install expo-notifications
