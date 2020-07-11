@@ -2,11 +2,26 @@ var firebase = require('firebase');
 var database = require("./FireBaseConfig.js");
 var moment = require("moment");
 
-/*
-===============================
-COMPLETEDCONSULTATIONPROCESS
-===============================
-*/
+async function sendReminderPushNotification(expoPushToken, modCode, bookingId, consultDetails) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: `Upcoming Consultation for ${modCode}:`,
+    body: `TA: ${consultDetails["ta"].name}\nDate: ${consultDetails["consultDate"]} | Time: ${consultDetails["consultStartTime"]}\nLocation: ${consultDetails["location"]}`,
+    data: {bookingId: bookingId},
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+
 function deductPoints(userIndex, participants, modCode, bookingId) {
   var userId = participants[userIndex].id;
   database
@@ -37,11 +52,6 @@ function completeConsultation(modCode, bookingId, consultDetails) {
   console.log("Removed: " + bookingId);
 }
 
-/*
-===============================
-CONSULTATIONREMINDERPROCESS
-===============================
-*/
 function role(id) {
   //Checks which role branch user belongs to (Student / Professor)
   var userRole;
@@ -55,46 +65,19 @@ function role(id) {
 
 function notifyUserConsultation(modCode, bookingId, consultDetails) {
   var participants = consultDetails["participants"];
-  console.log(participants);
   for (var each in participants) {
-    console.log(each);
     var user = participants[each];
     if (user.altStatus == "Accepted") { //If user has accepted consultation already
-      console.log(user);
-      sendOutNotification(user.id, modCode, bookingId, consultDetails);
+      database
+        .ref(`users/${role(user.id)}/${user.id}`)
+        .once("value")
+        .then((snapshot) => snapshot.val())
+        .then((data) => {
+          console.log(`Pushed out notification for ${user.id}`);
+          sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
+        });
     }
   }
-}
-
-function sendOutNotification(userId, modCode, bookingId, consultDetails) {
-  database
-    .ref(`users/${role(userId)}/${userId}`)
-    .once("value")
-    .then((snapshot) => snapshot.val())
-    .then((data) => {
-      console.log(`Pushed out notification for ${userId}`);
-      sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
-    });
-}
-
-async function sendReminderPushNotification(expoPushToken, modCode, bookingId, consultDetails) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: `Upcoming Consultation for ${modCode}:`,
-    body: `TA: ${consultDetails["ta"].name}\nDate: ${consultDetails["consultDate"]} | Time: ${consultDetails["consultStartTime"]}\nLocation: ${consultDetails["location"]}`,
-    data: {bookingId: bookingId},
-  };
-
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
 }
 
 module.exports = {
@@ -153,8 +136,8 @@ module.exports = {
               var consultStartTime = individualBookings["consultStartTime"];
               var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
               var consultationStartDateTime = moment(moment(consultDate + " " + consultStartTime, ["DD-MMM-YY hh:mm A"]).format());
+              console.log(currentDateTime + " ==== " + consultationStartDateTime);
               if (consultStatus != "Pending") { //If consultation is confirmed
-                console.log(currentDateTime.diff(consultationStartDateTime, 'minutes'));
                 if (currentDateTime.diff(consultationStartDateTime, 'minutes') == -(24 * 60)) { //check if current time is 24 hours before consultation start time
                   notifyUserConsultation(modCode, bookingId, bookings[bookingId]); //now to loop through each participant and check altstatus accepted then send push notifications
                 }
