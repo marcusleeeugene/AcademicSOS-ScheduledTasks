@@ -136,7 +136,7 @@ module.exports = {
               var consultStartTime = individualBookings["consultStartTime"];
               var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
               var consultationStartDateTime = moment(moment(consultDate + " " + consultStartTime, ["DD-MMM-YY hh:mm A"]).format());
-              console.log(currentDateTime.diff(consultationStartDateTime, 'minutes');
+              console.log(currentDateTime.diff(consultationStartDateTime, 'minutes'));
               if (consultStatus != "Pending") { //If consultation is confirmed
                 if (currentDateTime.diff(consultationStartDateTime, 'minutes') == -(24 * 60)) { //check if current time is 24 hours before consultation start time
                   notifyUserConsultation(modCode, bookingId, bookings[bookingId]); //now to loop through each participant and check altstatus accepted then send push notifications
