@@ -58,6 +58,7 @@ function notifyUserConsultation(modCode, bookingId, consultDetails) {
   for (var each in participants) {
     var user = participants[each];
     if (user.altStatus == "Accepted") { //If user has accepted consultation already
+      console.log(user);
       sendOutNotification(userId, modCode, bookingId, consultDetails);
     }
   }
