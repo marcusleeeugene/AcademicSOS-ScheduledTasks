@@ -59,18 +59,18 @@ function notifyUserConsultation(modCode, bookingId, consultDetails) {
     var user = participants[each];
     if (user.altStatus == "Accepted") { //If user has accepted consultation already
       console.log(user);
-      sendOutNotification(userId, modCode, bookingId, consultDetails);
+      sendOutNotification(user.id, modCode, bookingId, consultDetails);
     }
   }
 }
 
 function sendOutNotification(userId, modCode, bookingId, consultDetails) {
   database
-    .ref(`users/${role(user.id)}/${user.id}`)
+    .ref(`users/${role(userId)}/${userId}`)
     .once("value")
     .then((snapshot) => snapshot.val())
     .then((data) => {
-      console.log(`Pushed out notification for ${user.id}`);
+      console.log(`Pushed out notification for ${userId}`);
       sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
     });
 }
