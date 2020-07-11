@@ -23,6 +23,7 @@ function notifyUserConsultation(modCode, bookingId, consultDetails) {
         .once("value")
         .then((snapshot) => snapshot.val())
         .then((data) => {
+          console.log(data);
           sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
         });
     }
