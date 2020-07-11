@@ -2,54 +2,11 @@ var firebase = require('firebase');
 var database = require("./FireBaseConfig.js");
 var moment = require("moment");
 
-function role(id) {
-  //Checks which role branch user belongs to (Student / Professor)
-  var userRole;
-  if (id.charAt(0) == "e" || id.charAt(0) == "E") {
-    userRole = "students";
-  } else {
-    userRole = "professors";
-  }
-  return userRole;
-};
-
-function notifyUserConsultation(modCode, bookingId, consultDetails) {
-  var participants = consultDetails["participants"];
-  for (var each in participants) {
-    var user = participants[each];
-    if (user.altStatus == "Accepted") { //If user has accepted consultation already
-      database
-        .ref(`users/${role(user.id)}/${user.id}`)
-        .once("value")
-        .then((snapshot) => snapshot.val())
-        .then((data) => {
-          console.log(`Pushed out notification for ${user.id}`);
-          sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
-        });
-    }
-  }
-}
-
-async function sendReminderPushNotification(expoPushToken, modCode, bookingId, consultDetails) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: `Upcoming Consultation for ${modCode}:`,
-    body: `TA: ${consultDetails["ta"].name}\nDate: ${consultDetails["consultDate"]} | Time: ${consultDetails["consultStartTime"]}\nLocation: ${consultDetails["location"]}`,
-    data: {bookingId: bookingId},
-  };
-
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
-
+/*
+===============================
+COMPLETEDCONSULTATIONPROCESS
+===============================
+*/
 function deductPoints(userIndex, participants, modCode, bookingId) {
   var userId = participants[userIndex].id;
   database
@@ -78,6 +35,63 @@ function completeConsultation(modCode, bookingId, consultDetails) {
   }
   database.ref(`modules/${modCode}/bookings`).child(bookingId).remove(); //delete consultation from bookings
   console.log("Removed: " + bookingId);
+}
+
+/*
+===============================
+CONSULTATIONREMINDERPROCESS
+===============================
+*/
+function role(id) {
+  //Checks which role branch user belongs to (Student / Professor)
+  var userRole;
+  if (id.charAt(0) == "e" || id.charAt(0) == "E") {
+    userRole = "students";
+  } else {
+    userRole = "professors";
+  }
+  return userRole;
+};
+
+function notifyUserConsultation(modCode, bookingId, consultDetails) {
+  var participants = consultDetails["participants"];
+  for (var each in participants) {
+    var user = participants[each];
+    if (user.altStatus == "Accepted") { //If user has accepted consultation already
+      sendOutNotification(userId, modCode, bookingId, consultDetails);
+    }
+  }
+}
+
+function sendOutNotification(userId, modCode, bookingId, consultDetails) {
+  database
+    .ref(`users/${role(user.id)}/${user.id}`)
+    .once("value")
+    .then((snapshot) => snapshot.val())
+    .then((data) => {
+      console.log(`Pushed out notification for ${user.id}`);
+      sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
+    });
+}
+
+async function sendReminderPushNotification(expoPushToken, modCode, bookingId, consultDetails) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: `Upcoming Consultation for ${modCode}:`,
+    body: `TA: ${consultDetails["ta"].name}\nDate: ${consultDetails["consultDate"]} | Time: ${consultDetails["consultStartTime"]}\nLocation: ${consultDetails["location"]}`,
+    data: {bookingId: bookingId},
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
 }
 
 module.exports = {
