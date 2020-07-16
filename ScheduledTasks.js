@@ -23,7 +23,9 @@ function deductPoints(userIndex, participants, modCode, bookingId) {
       console.log("Deducted 10 points from: " + userId);
       return data.priorityPoint -= 10;
     }).then((updatedPriorityPoints) => {
-      if (updatedPriorityPoints <= 30) { //ban user from booking if points 30 or less
+      if (updatedPriorityPoints <= 0) { //permanently ban user if points 0 or less
+        setPermanentBan(userId, modCode);
+      } else if (updatedPriorityPoints <= 30) { //ban user from booking if points 30 or less
         setBanReleaseDate(userId, modCode);
       }
     });
@@ -134,6 +136,23 @@ function setBanReleaseDate(userId, modCode) {
     })
 }
 
+function setPermanentBan(userId, modCode) {
+  database
+    .ref(`users/students/${userId}/modules/${modCode}`)
+    .once("value")
+    .then((snapshot) => snapshot.val())
+    .then((data) => {
+      database.ref(`users/students/${userId}/modules`).child(modCode).update({ //set banDateRelease
+        name: data.name,
+        priorityPoint: data.priorityPoint,
+        role: data.role,
+        tutorialClass: data.tutorialClass,
+        banDateRelease: "permanent"
+      });
+      console.log(`Set permanent ban for ${modCode}:  ${userId}`);
+    })
+}
+
 module.exports = {
   updateConsultEndTime: function () {
     console.log("completedConsultationProcess - DateTime:" + moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
@@ -210,7 +229,7 @@ module.exports = {
         var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
         for (var student in obj) { //Loop each student
           for (var modCode in obj[student]["modules"]) {
-            if (obj[student]["modules"][modCode].banDateRelease != "") {
+            if (obj[student]["modules"][modCode].banDateRelease != "" || obj[student]["modules"][modCode].banDateRelease != "permanent") {
               var banDateRelease = moment(moment(obj[student]["modules"][modCode].banDateRelease, ["DD-MMM-YY hh:mm A"]).format());
               if (currentDateTime.diff(banDateRelease, 'days') == 0) {
                 resetBanDate(student, modCode);
