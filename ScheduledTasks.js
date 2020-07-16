@@ -58,7 +58,7 @@ function role(id) {
   return userRole;
 };
 
-function notifyUserConsultation(modCode, bookingId, consultDetails) {
+function notifyUserConsultation(modCode, consultDetails) {
   var participants = consultDetails["participants"];
   for (var each in participants) {
     var user = participants[each];
@@ -68,19 +68,19 @@ function notifyUserConsultation(modCode, bookingId, consultDetails) {
         .once("value")
         .then((snapshot) => snapshot.val())
         .then((data) => {
-          sendReminderPushNotification(data.pushToken, modCode, bookingId, consultDetails); //Send notification to user
+          sendReminderPushNotification(data.pushToken, modCode, consultDetails); //Send notification to user
         });
     }
   }
 }
 
-async function sendReminderPushNotification(expoPushToken, modCode, bookingId, consultDetails) {
+async function sendReminderPushNotification(expoPushToken, modCode, consultDetails) {
   const message = {
     to: expoPushToken,
     sound: 'default',
     title: `Upcoming Consultation for ${modCode}:`,
     body: `TA: ${consultDetails["ta"].name}\nDate: ${consultDetails["consultDate"]} | Time: ${consultDetails["consultStartTime"]}\nLocation: ${consultDetails["location"]}`,
-    data: {bookingId: bookingId},
+    data: {},
   };
 
   await fetch('https://exp.host/--/api/v2/push/send', {
@@ -192,7 +192,7 @@ module.exports = {
               var consultationStartDateTime = moment(moment(consultDate + " " + consultStartTime, ["DD-MMM-YY hh:mm A"]).format());
               if (consultStatus != "Pending") { //If consultation is confirmed
                 if (currentDateTime.diff(consultationStartDateTime, 'minutes') == -(24 * 60)) { //check if current time is 24 hours before consultation start time
-                  notifyUserConsultation(modCode, bookingId, bookings[bookingId]); //now to loop through each participant and check altstatus accepted then send push notifications
+                  notifyUserConsultation(modCode, bookings[bookingId]); //now to loop through each participant and check altstatus accepted then send push notifications
                 }
               }
             }
