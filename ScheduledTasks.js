@@ -4,7 +4,7 @@ var moment = require("moment");
 
 /*
 ==============================
-COMPLETED CONSULTATION PROCESS
+COMPLETED CONSULTATION
 ==============================
 */
 function deductPoints(userIndex, participants, modCode, bookingId) {
@@ -21,7 +21,12 @@ function deductPoints(userIndex, participants, modCode, bookingId) {
         tutorialClass: data.tutorialClass
       });
       console.log("Deducted 10 points from: " + userId);
-    })
+      return data.priorityPoint -= 10;
+    }).then((updatedPriorityPoints) => {
+      if (updatedPriorityPoints <= 30) { //ban user from booking if points 30 or less
+        setBanReleaseDate(userId, modCode);
+      }
+    });
 }
 
 function completeConsultation(modCode, bookingId, consultDetails) {
@@ -39,7 +44,7 @@ function completeConsultation(modCode, bookingId, consultDetails) {
 
 /*
 ==============================
-CONSULTATION REMINDER PROCESS
+CONSULTATION REMINDER
 ==============================
 */
 function role(id) {
@@ -87,6 +92,46 @@ async function sendReminderPushNotification(expoPushToken, modCode, bookingId, c
     },
     body: JSON.stringify(message),
   });
+}
+
+/*
+==============================
+BAN DATE
+==============================
+*/
+function resetBanDate(userId, modCode) {
+  database
+    .ref(`users/students/${userId}/modules/${modCode}`)
+    .once("value")
+    .then((snapshot) => snapshot.val())
+    .then((data) => {
+      database.ref(`users/students/${userId}/modules`).child(modCode).update({ //reset banDateRelease
+        name: data.name,
+        priorityPoint: data.priorityPoint,
+        role: data.role,
+        tutorialClass: data.tutorialClass,
+        banDateRelease: ""
+      });
+      console.log(`Resetted banDateRelease for ${modCode}:  ${userId}`);
+    })
+}
+
+function setBanReleaseDate(userId, modCode) {
+  var banDateRelease = moment(moment(new Date()).add(7, 'days'), ["DD-MMM-YY"]).format();
+  database
+    .ref(`users/students/${userId}/modules/${modCode}`)
+    .once("value")
+    .then((snapshot) => snapshot.val())
+    .then((data) => {
+      database.ref(`users/students/${userId}/modules`).child(modCode).update({ //set banDateRelease
+        name: data.name,
+        priorityPoint: data.priorityPoint,
+        role: data.role,
+        tutorialClass: data.tutorialClass,
+        banDateRelease: banDateRelease
+      });
+      console.log(`Set new banDateRelease for ${modCode}:  ${userId}`);
+    })
 }
 
 module.exports = {
@@ -149,6 +194,26 @@ module.exports = {
                 if (currentDateTime.diff(consultationStartDateTime, 'minutes') == -(24 * 60)) { //check if current time is 24 hours before consultation start time
                   notifyUserConsultation(modCode, bookingId, bookings[bookingId]); //now to loop through each participant and check altstatus accepted then send push notifications
                 }
+              }
+            }
+          }
+        }
+      });
+  },
+  releaseBanDate: function() {
+    console.log("releaseBanDateProcess - DateTime:" + moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
+    database
+      .ref(`users/students`)
+      .once("value")
+      .then((snapshot) => snapshot.val())
+      .then((obj) => {
+        var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
+        for (var student in obj) { //Loop each student
+          for (var modCode in obj[student]["modules"]) {
+            if (obj[student]["modules"][modCode].banDateRelease != "") {
+              var banDateRelease = moment(moment(obj[student]["modules"][modCode].banDateRelease, ["DD-MMM-YY hh:mm A"]).format());
+              if (currentDateTime.diff(banDateRelease, 'days') == 0) {
+                resetBanDate(student, modCode);
               }
             }
           }

@@ -21,6 +21,16 @@ var consultationReminderProcess = new CronJob(
 	'Asia/Singapore'
 );
 
+var releaseBanDateProcess = new CronJob(
+	'*/1 * * * *', //Every 1min run function
+	function() {
+		ScheduledTasks.releaseBanDate();
+	},
+	null,
+	true,
+	'Asia/Singapore'
+);
 
 completedConsultationProcess.start();
 consultationReminderProcess.start();
+releaseBanDateProcess.start();
