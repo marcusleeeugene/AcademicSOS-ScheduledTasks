@@ -1,6 +1,7 @@
 var firebase = require('firebase');
 var database = require("./FireBaseConfig.js");
 var moment = require("moment");
+moment.suppressDeprecationWarnings = true;
 
 /*
 ==============================
@@ -119,7 +120,7 @@ function resetBanDate(userId, modCode) {
 }
 
 function setBanReleaseDate(userId, modCode) {
-  var banDateRelease = moment(moment(new Date()).add(7, 'days'), ["DD-MMM-YY"]).format();
+  var banDateRelease = moment(new Date()).add(7, 'days').format("DD-MMM-YY");
   database
     .ref(`users/students/${userId}/modules/${modCode}`)
     .once("value")
