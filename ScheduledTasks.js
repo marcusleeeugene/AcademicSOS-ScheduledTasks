@@ -170,11 +170,11 @@ module.exports = {
             for (var userBookings in bookings) { //Loop each booking
               var individualBookings = bookings[userBookings];
               var consultStatus = individualBookings["consultStatus"];
-              var bookingId = Object.keys(bookings)[0];
+              var bookingId = Object.keys(bookings)[userBookings];
               var consultDate = individualBookings["consultDate"];
               var consultEndTime = individualBookings["consultEndTime"];
-              var currentDateTime = moment(new Date(), ["DD-MMM-YY hh:mm A"]).format();
-              var consultationEndDateTime = moment(consultDate + " " + consultEndTime, ["DD-MMM-YY hh:mm A"]).format();
+              var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
+              var consultationEndDateTime = moment(moment(consultDate + " " + consultEndTime, ["DD-MMM-YY hh:mm A"]).format());
               if (consultStatus != "Pending") { //If consultation is confirmed
                 if (currentDateTime >= consultationEndDateTime) { //check if consultation date and time ended
                   completeConsultation(modCode, bookingId, bookings[bookingId]);
@@ -205,7 +205,7 @@ module.exports = {
             for (var userBookings in bookings) { //Loop each booking
               var individualBookings = bookings[userBookings];
               var consultStatus = individualBookings["consultStatus"];
-              var bookingId = Object.keys(bookings)[0];
+              var bookingId = Object.keys(bookings)[userBookings];
               var consultDate = individualBookings["consultDate"];
               var consultStartTime = individualBookings["consultStartTime"];
               var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
