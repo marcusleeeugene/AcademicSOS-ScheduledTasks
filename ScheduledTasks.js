@@ -167,10 +167,12 @@ module.exports = {
           var modules = obj[modCode];
           var bookings = modules["bookings"];
           if (bookings != undefined) {
+            var index = 0;
             for (var userBookings in bookings) { //Loop each booking
               var individualBookings = bookings[userBookings];
               var consultStatus = individualBookings["consultStatus"];
-              var bookingId = Object.keys(bookings)[userBookings];
+              var bookingId = Object.keys(bookings)[index];
+              index++;
               var consultDate = individualBookings["consultDate"];
               var consultEndTime = individualBookings["consultEndTime"];
               var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
@@ -202,10 +204,12 @@ module.exports = {
           var modules = obj[modCode];
           var bookings = modules["bookings"];
           if (bookings != undefined) {
+            var index = 0;
             for (var userBookings in bookings) { //Loop each booking
               var individualBookings = bookings[userBookings];
               var consultStatus = individualBookings["consultStatus"];
-              var bookingId = Object.keys(bookings)[userBookings];
+              var bookingId = Object.keys(bookings)[index];
+              index++;
               var consultDate = individualBookings["consultDate"];
               var consultStartTime = individualBookings["consultStartTime"];
               var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
