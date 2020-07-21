@@ -113,7 +113,7 @@ function resetBanDate(userId, modCode) {
         priorityPoint: data.priorityPoint,
         role: data.role,
         tutorialClass: data.tutorialClass,
-        banDateRelease: ""
+        banDateRelease: " "
       });
       console.log(`Resetted banDateRelease for ${modCode}:  ${userId}`);
     })
@@ -234,7 +234,7 @@ module.exports = {
         var currentDateTime = moment(moment(new Date(), ["DD-MMM-YY hh:mm A"]).format());
         for (var student in obj) { //Loop each student
           for (var modCode in obj[student]["modules"]) {
-            if (obj[student]["modules"][modCode].banDateRelease != "" || obj[student]["modules"][modCode].banDateRelease != "permanent") {
+            if (obj[student]["modules"][modCode].banDateRelease.length > 0 && obj[student]["modules"][modCode].banDateRelease != "permanent") {
               var banDateRelease = moment(moment(obj[student]["modules"][modCode].banDateRelease, ["DD-MMM-YY hh:mm A"]).format());
               if (currentDateTime.diff(banDateRelease, 'days') == 0) {
                 resetBanDate(student, modCode);
